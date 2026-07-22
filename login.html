@@ -1,1 +1,339 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng Nhập Hệ Thống</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: #ffffff;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .auth-card h2 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .auth-card p.subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd1;
+        }
+
+        .divider {
+            margin: 20px 0;
+            position: relative;
+            text-align: center;
+        }
+
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: #eee;
+        }
+
+        .divider span {
+            position: relative;
+            background: #fff;
+            padding: 0 10px;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .btn-google {
+            background: #fff;
+            color: #444;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-google img {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toggle-text {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .toggle-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Màn hình sau khi đăng nhập thành công */
+        .user-profile {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .btn-logout {
+            background: #ff4d4f;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-logout:hover {
+            background: #ff7875;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="auth-card">
+        <!-- 1. FORM ĐĂNG NHẬP / ĐĂNG KÝ (Hiển thị mặc định) -->
+        <div id="auth-form-box">
+            <h2 id="form-title">Đăng Nhập</h2>
+            <p class="subtitle" id="form-subtitle">Chào mừng bạn quay trở lại!</p>
+
+            <div class="input-group">
+                <label for="email">Địa chỉ Email</label>
+                <input type="email" id="email" placeholder="nguyoenvana@gmail.com" required>
+            </div>
+
+            <div class="input-group">
+                <label for="password">Mật khẩu</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+
+            <button class="btn btn-primary" id="btn-submit" onclick="handleEmailAuth()">Đăng Nhập</button>
+
+            <div class="divider">
+                <span>HOẶC</span>
+            </div>
+
+            <button class="btn btn-google" onclick="loginWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Đăng nhập bằng Google
+            </button>
+
+            <p class="toggle-text">
+                <span id="toggle-desc">Chưa có tài khoản?</span> 
+                <a id="toggle-link" onclick="toggleAuthMode()">Đăng ký ngay</a>
+            </p>
+        </div>
+
+        <!-- 2. MÀN HÌNH THÔNG TIN NGƯỜI DÙNG (Hiển thị sau khi đăng nhập thành công) -->
+        <div id="user-profile-box" class="user-profile">
+            <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+            <h2 id="user-name">Người dùng</h2>
+            <p class="subtitle" id="user-email"></p>
+
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 13px; color: #555; text-align: left; margin-bottom: 15px;">
+                <strong>Mã ID người dùng (UID):</strong>
+                <p id="user-uid" style="word-break: break-all; font-family: monospace; color: #333; margin-top: 4px;"></p>
+            </div>
+
+            <button class="btn btn-logout" onclick="handleLogout()">Đăng Xuất</button>
+        </div>
+    </div>
+
+    <!-- TÍCH HỢP FIREBASE SDK v10 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+        // ⚠️ THAY THẾ THÔNG TIN FIREBASE CONFIG CỦA BẠN VÀO ĐÂY
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Khởi tạo Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        let isSignUpMode = false; // Trạng thái: Đang ở chế độ Đăng ký hay Đăng nhập
+
+        // --- 1. Chuyển đổi giữa chế độ Đăng Nhập & Đăng Ký ---
+        window.toggleAuthMode = () => {
+            isSignUpMode = !isSignUpMode;
+            
+            const title = document.getElementById("form-title");
+            const subtitle = document.getElementById("form-subtitle");
+            const btnSubmit = document.getElementById("btn-submit");
+            const toggleDesc = document.getElementById("toggle-desc");
+            const toggleLink = document.getElementById("toggle-link");
+
+            if (isSignUpMode) {
+                title.innerText = "Tạo Tài Khoản";
+                subtitle.innerText = "Đăng ký để bắt đầu trải nghiệm!";
+                btnSubmit.innerText = "Đăng Ký";
+                toggleDesc.innerText = "Đã có tài khoản?";
+                toggleLink.innerText = "Đăng nhập";
+            } else {
+                title.innerText = "Đăng Nhập";
+                subtitle.innerText = "Chào mừng bạn quay trở lại!";
+                btnSubmit.innerText = "Đăng Nhập";
+                toggleDesc.innerText = "Chưa có tài khoản?";
+                toggleLink.innerText = "Đăng ký ngay";
+            }
+        };
+
+        // --- 2. Xử lý Đăng nhập / Đăng ký bằng Email & Mật khẩu ---
+        window.handleEmailAuth = async () => {
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value;
+
+            if (!email || !password) {
+                alert("Vui lòng điền đầy đủ Email và Mật khẩu!");
+                return;
+            }
+
+            try {
+                if (isSignUpMode) {
+                    // Đăng ký tài khoản mới
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    alert("Đăng ký thành công!");
+                } else {
+                    // Đăng nhập tài khoản cũ
+                    await signInWithEmailAndPassword(auth, email, password);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Thất bại: " + error.message);
+            }
+        };
+
+        // --- 3. Đăng nhập bằng Google ---
+        window.loginWithGoogle = async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error(error);
+                alert("Đăng nhập Google thất bại: " + error.message);
+            }
+        };
+
+        // --- 4. Đăng xuất ---
+        window.handleLogout = () => {
+            signOut(auth);
+        };
+
+        // --- 5. Lắng nghe trạng thái người dùng (Tự động chuyển giao diện) ---
+        onAuthStateChanged(auth, (user) => {
+            const authFormBox = document.getElementById("auth-form-box");
+            const userProfileBox = document.getElementById("user-profile-box");
+
+            if (user) {
+                // Đã đăng nhập ➔ Ẩn form, hiển thị thông tin user
+                authFormBox.style.display = "none";
+                userProfileBox.style.display = "block";
+
+                document.getElementById("user-avatar").src = user.photoURL || "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.email);
+                document.getElementById("user-name").innerText = user.displayName || "Thành viên";
+                document.getElementById("user-email").innerText = user.email;
+                document.getElementById("user-uid").innerText = user.uid;
+            } else {
+                // Chưa đăng nhập ➔ Hiển thị form đăng nhập
+                authFormBox.style.display = "block";
+                userProfileBox.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
