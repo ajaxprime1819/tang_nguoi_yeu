@@ -2,319 +2,142 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cửa Hàng Trực Tuyến</title>
+    <title>Game Hứng Bóng</title>
     <style>
-        /* --- CSS STYLES --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: #f4f6f8;
-            color: #333;
-        }
-
-        header {
-            background-color: #2c3e50;
+            background-color: #222;
             color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .search-box input {
-            padding: 8px 12px;
-            border-radius: 4px;
-            border: none;
-            width: 250px;
-            outline: none;
-        }
-
-        .container {
-            display: flex;
-            max-width: 1200px;
-            margin: 20px auto;
-            gap: 20px;
-            padding: 0 10px;
-        }
-
-        /* Danh sách sản phẩm */
-        .products-grid {
-            flex: 3;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             text-align: center;
-        }
-
-        .product-card img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        .product-title {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
-        }
-
-        .product-price {
-            color: #e74c3c;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-
-        .btn-add {
-            background-color: #27ae60;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-add:hover {
-            background-color: #219150;
-        }
-
-        /* Giỏ hàng */
-        .cart-section {
-            flex: 1;
-            background: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            height: fit-content;
         }
-
-        .cart-title {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-        }
-
-        .cart-controls button {
-            background: #eee;
-            border: none;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            border-radius: 3px;
-            font-weight: bold;
-        }
-
-        .btn-remove {
-            color: #e74c3c;
-            background: none !important;
-            margin-left: 8px;
-        }
-
-        .cart-total {
-            border-top: 2px solid #eee;
-            padding-top: 15px;
-            margin-top: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .btn-checkout {
-            width: 100%;
-            background: #e67e22;
-            color: white;
-            border: none;
-            padding: 10px;
-            margin-top: 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .btn-checkout:hover {
-            background: #d35400;
+        canvas {
+            background: #111;
+            border: 2px solid #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+            cursor: none;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h2>Shop Online</h2>
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Tìm sản phẩm..." onkeyup="searchProducts()">
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- Khu vực Sản phẩm -->
-        <div class="products-grid" id="productGrid">
-            <!-- Sản phẩm sẽ được hiển thị bằng JavaScript -->
-        </div>
-
-        <!-- Khu vực Giỏ hàng -->
-        <div class="cart-section">
-            <h3 class="cart-title">Giỏ Hàng Của Bạn</h3>
-            <div id="cartItems">
-                <p>Giỏ hàng đang trống.</p>
-            </div>
-            <div class="cart-total">
-                <span>Tổng tiền:</span>
-                <span id="cartTotal">0 VNĐ</span>
-            </div>
-            <button class="btn-checkout" onclick="checkout()">Thanh Toán</button>
-        </div>
-    </div>
+    <h1>Game Hứng Bóng</h1>
+    <p>Di chuyển chuột để điều khiển thanh đỡ!</p>
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
 
     <script>
-        // --- JAVASCRIPT LOGIC ---
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
 
-        // 1. Khai báo danh sách sản phẩm mẫu
-        const products = [
-            { id: 1, name: "Áo Thun Nam Premium", price: 150000, image: "https://via.placeholder.com/150/24c6dc/ffffff?text=Ao+Thun" },
-            { id: 2, name: "Quần Jean Slimfit", price: 350000, image: "https://via.placeholder.com/150/514a9d/ffffff?text=Quan+Jean" },
-            { id: 3, name: "Giày Sneaker Thể Thao", price: 550000, image: "https://via.placeholder.com/150/f12711/ffffff?text=Giay+Sneaker" },
-            { id: 4, name: "Mũ Cót Thời Trang", price: 90000, image: "https://via.placeholder.com/150/f5af19/ffffff?text=Mu+Cap" },
-            { id: 5, name: "Balo Du Lịch Chống Nước", price: 420000, image: "https://via.placeholder.com/150/11998e/ffffff?text=Balo" }
-        ];
+        // 1. Khai báo thông số game
+        let score = 0;
+        let gameOver = false;
 
-        let cart = [];
+        // Quả bóng
+        let ball = {
+            x: 200,
+            y: 50,
+            radius: 10,
+            dx: 3,
+            dy: 3,
+            color: "#ff0055"
+        };
 
-        // 2. Hàm hiển thị sản phẩm ra màn hình
-        function renderProducts(list) {
-            const productGrid = document.getElementById('productGrid');
-            productGrid.innerHTML = '';
+        // Thanh đỡ
+        let paddle = {
+            width: 80,
+            height: 12,
+            x: 160,
+            y: 470,
+            color: "#00ffcc"
+        };
 
-            list.forEach(product => {
-                const productHTML = `
-                    <div class="product-card">
-                        <img src="${product.image}" alt="${product.name}">
-                        <h4 class="product-title">${product.name}</h4>
-                        <div class="product-price">${product.price.toLocaleString('vi-VN')} VNĐ</div>
-                        <button class="btn-add" onclick="addToCart(${product.id})">Thêm vào giỏ</button>
-                    </div>
-                `;
-                productGrid.innerHTML += productHTML;
-            });
-        }
+        // 2. Lắng nghe sự kiện di chuyển chuột
+        canvas.addEventListener("mousemove", function(e) {
+            let rect = canvas.getBoundingClientRect();
+            paddle.x = e.clientX - rect.left - paddle.width / 2;
+        });
 
-        // 3. Hàm thêm sản phẩm vào giỏ hàng
-        function addToCart(productId) {
-            const product = products.find(p => p.id === productId);
-            const cartItem = cart.find(item => item.id === productId);
+        // 3. Vòng lặp cập nhật trạng thái game
+        function update() {
+            if (gameOver) return;
 
-            if (cartItem) {
-                cartItem.quantity += 1;
-            } else {
-                cart.push({ ...product, quantity: 1 });
+            // Di chuyển bóng
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            // Va chạm với tường trái/phải
+            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+                ball.dx = -ball.dx;
             }
-            updateCart();
+
+            // Va chạm với tường trên
+            if (ball.y - ball.radius < 0) {
+                ball.dy = -ball.dy;
+            }
+
+            // Va chạm với thanh đỡ
+            if (
+                ball.y + ball.radius >= paddle.y &&
+                ball.x >= paddle.x &&
+                ball.x <= paddle.x + paddle.width
+            ) {
+                ball.dy = -ball.dy;
+                score += 10;
+                // Tăng tốc độ bóng một chút khi đập trúng thanh đỡ
+                ball.dy *= 1.05;
+                ball.dx *= 1.05;
+            }
+
+            // Xử lý khi bóng rơi xuống đáy (Thua)
+            if (ball.y + ball.radius > canvas.height) {
+                gameOver = true;
+            }
         }
 
-        // 4. Hàm cập nhật lại giỏ hàng và tổng tiền
-        function updateCart() {
-            const cartItemsContainer = document.getElementById('cartItems');
-            const cartTotal = document.getElementById('cartTotal');
+        // 4. Vẽ các đối tượng lên màn hình
+        function draw() {
+            // Xóa màn hình cũ
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p>Giỏ hàng đang trống.</p>';
-                cartTotal.innerText = '0 VNĐ';
+            if (gameOver) {
+                ctx.fillStyle = "white";
+                ctx.font = "30px Arial";
+                ctx.fillText("GAME OVER", 110, 230);
+                ctx.font = "20px Arial";
+                ctx.fillText("Điểm của bạn: " + score, 130, 270);
                 return;
             }
 
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
+            // Vẽ bóng
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            ctx.closePath();
 
-            cart.forEach(item => {
-                total += item.price * item.quantity;
-                const itemHTML = `
-                    <div class="cart-item">
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            <small>${item.price.toLocaleString('vi-VN')} VNĐ</small>
-                        </div>
-                        <div class="cart-controls">
-                            <button onclick="changeQuantity(${item.id}, -1)">-</button>
-                            <span>${item.quantity}</span>
-                            <button onclick="changeQuantity(${item.id}, 1)">+</button>
-                            <button class="btn-remove" onclick="removeFromCart(${item.id})">✕</button>
-                        </div>
-                    </div>
-                `;
-                cartItemsContainer.innerHTML += itemHTML;
-            });
+            // Vẽ thanh đỡ
+            ctx.fillStyle = paddle.color;
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
 
-            cartTotal.innerText = `${total.toLocaleString('vi-VN')} VNĐ`;
+            // Vẽ điểm số
+            ctx.fillStyle = "white";
+            ctx.font = "16px Arial";
+            ctx.fillText("Điểm: " + score, 10, 25);
         }
 
-        // 5. Thay đổi số lượng
-        function changeQuantity(productId, delta) {
-            const cartItem = cart.find(item => item.id === productId);
-            if (cartItem) {
-                cartItem.quantity += delta;
-                if (cartItem.quantity <= 0) {
-                    removeFromCart(productId);
-                } else {
-                    updateCart();
-                }
+        // 5. Vòng lặp chính của Game (Game Loop)
+        function gameLoop() {
+            update();
+            draw();
+            if (!gameOver) {
+                requestAnimationFrame(gameLoop);
             }
         }
 
-        // 6. Xóa khỏi giỏ hàng
-        function removeFromCart(productId) {
-            cart = cart.filter(item => item.id !== productId);
-            updateCart();
-        }
-
-        // 7. Tìm kiếm sản phẩm
-        function searchProducts() {
-            const keyword = document.getElementById('searchInput').value.toLowerCase();
-            const filteredProducts = products.filter(p => p.name.toLowerCase().includes(keyword));
-            renderProducts(filteredProducts);
-        }
-
-        // 8. Thanh toán giả lập
-        function checkout() {
-            if (cart.length === 0) {
-                alert("Giỏ hàng của bạn đang trống!");
-            } else {
-                alert("Cảm ơn bạn đã đặt hàng! Đơn hàng sẽ sớm được xử lý.");
-                cart = [];
-                updateCart();
-            }
-        }
-
-        // Chạy hàm hiển thị lần đầu khi mở trang
-        renderProducts(products);
+        // Bắt đầu chạy game
+        gameLoop();
     </script>
 </body>
 </html>
