@@ -224,3 +224,121 @@
 
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input ID Form</title>
+    <!-- FontAwesome Icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d1117;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Khung chứa ô nhập ID */
+        .id-box {
+            background: #090d12;
+            border: 1px solid #1a2332;
+            border-radius: 10px;
+            padding: 20px;
+            width: 320px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .id-box label {
+            color: #2fb1db;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Khung bao ngoài input để đặt icon */
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 12px;
+            color: #2fb1db;
+            font-size: 14px;
+        }
+
+        /* Ô nhập dữ liệu */
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            background: #05080c;
+            border: 1px solid #161f2e;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Hiệu ứng khi bấm vào ô nhập */
+        .input-group input:focus {
+            border-color: #2fb1db;
+            box-shadow: 0 0 8px rgba(47, 177, 219, 0.3);
+        }
+
+        /* Nút xác nhận */
+        .btn-submit {
+            background: #2fb1db;
+            color: #05080c;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-submit:hover {
+            background: #2593b8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="id-box">
+    <label for="userId">Nhập ID người dùng:</label>
+    <div class="input-group">
+        <i class="fa-solid fa-id-card"></i>
+        <input type="text" id="userId" placeholder="Ví dụ: 123456789">
+    </div>
+    <button class="btn-submit" onclick="submitId()">Xác nhận</button>
+</div>
+
+<script>
+    function submitId() {
+        const idValue = document.getElementById('userId').value;
+        if (idValue.trim() === '') {
+            alert('Vui lòng nhập ID!');
+        } else {
+            alert('Đã nhận ID: ' + idValue);
+        }
+    }
+</script>
+
+</body>
+</html>
