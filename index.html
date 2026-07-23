@@ -2,202 +2,225 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Game Bắn Máy Bay 2D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Mode Settings Panel</title>
+    <!-- Icon FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background-color: #0f172a;
-            color: white;
-            text-align: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        canvas {
-            background: #020617;
-            border: 2px solid #38bdf8;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-            border-radius: 8px;
+
+        body {
+            background-color: #0d1117;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .instructions {
-            margin-top: 10px;
-            color: #94a3b8;
+
+        /* Khung Panel Chính */
+        .panel-container {
+            width: 320px;
+            background: #090d12;
+            border: 1px solid #1a2332;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        /* Thanh Sidebar Icon Bên Trái */
+        .sidebar {
+            width: 60px;
+            background: #05080c;
+            border-right: 1px solid #161f2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 15px;
+            gap: 15px;
+        }
+
+        .sidebar .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2fb1db;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar .icon-btn:hover {
+            background: rgba(47, 177, 219, 0.1);
+        }
+
+        .sidebar .icon-btn.active {
+            border: 1.5px solid #2fb1db;
+            box-shadow: 0 0 10px rgba(47, 177, 219, 0.3);
+        }
+
+        /* Phần Nội Dung Bên Phải */
+        .main-content {
+            flex: 1;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tiêu đề Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .header .title {
+            color: #fff;
+        }
+
+        .header .title span {
+            color: #2fb1db;
+        }
+
+        .header .close-btn {
+            color: #2fb1db;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .category-title {
+            text-align: center;
+            color: #2fb1db;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Danh Sách Tùy Chọn (Checklist) */
+        .option-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        /* Tùy Chỉnh Nút Checkbox */
+        .checkbox-custom {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #2fb1db;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #05080c;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .option-item input[type="checkbox"] {
+            display: none;
+        }
+
+        /* Khi bỏ chọn checkbox */
+        .option-item input[type="checkbox"]:not(:checked) + .checkbox-custom {
+            background: transparent;
+            border: 2px solid #2fb1db;
+            color: transparent;
+        }
+
+        .option-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2fb1db;
+            user-select: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>🚀 Space Shooter 2D</h1>
-    <canvas id="gameCanvas" width="400" height="500"></canvas>
-    <div class="instructions">
-        <p>Sử dụng phím ⬅️ ➡️ để di chuyển | Phím <b>SPACE</b> để bắn</p>
+<div class="panel-container">
+    <!-- Sidebar bên trái -->
+    <div class="sidebar">
+        <div class="icon-btn"><i class="fa-solid fa-crosshairs"></i></div>
+        <div class="icon-btn"><i class="fa-solid fa-swords"></i></div>
+        <div class="icon-btn active"><i class="fa-solid fa-eye"></i></div>
+        <div class="icon-btn"><i class="fa-solid fa-user"></i></div>
     </div>
 
-    <script>
-        const canvas = document.getElementById("gameCanvas");
-        const ctx = canvas.getContext("2d");
+    <!-- Nội dung chính bên phải -->
+    <div class="main-content">
+        <div class="header">
+            <div class="title">System <span>Mods</span></div>
+            <div class="close-btn"><i class="fa-solid fa-xmark"></i></div>
+        </div>
 
-        // Trạng thái Game
-        let score = 0;
-        let gameOver = false;
+        <div class="category-title">Display Settings</div>
 
-        // Bàn phím
-        const keys = {};
+        <div class="option-list">
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">Enable System</span>
+            </label>
 
-        window.addEventListener("keydown", e => keys[e.code] = true);
-        window.addEventListener("keyup", e => keys[e.code] = false);
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">Show Lines</span>
+            </label>
 
-        // 1. Tàu của người chơi
-        const player = {
-            x: 180,
-            y: 440,
-            width: 40,
-            height: 30,
-            speed: 5,
-            color: "#38bdf8"
-        };
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">Show Bounding Box</span>
+            </label>
 
-        // 2. Danh sách Đạn và Kẻ địch
-        let bullets = [];
-        let enemies = [];
-        let lastShot = 0;
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">Show Health Bar</span>
+            </label>
 
-        // Hàm tạo kẻ địch ngẫu nhiên
-        function spawnEnemy() {
-            if (Math.random() < 0.03) { // Tỷ lệ xuất hiện kẻ địch
-                enemies.push({
-                    x: Math.random() * (canvas.width - 30),
-                    y: -30,
-                    width: 30,
-                    height: 30,
-                    speed: 2 + Math.random() * 2,
-                    color: "#f43f5e"
-                });
-            }
-        }
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">Show Distance</span>
+            </label>
 
-        // 3. Xử lý di chuyển & Logic game
-        function update() {
-            if (gameOver) return;
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">FOV Overlay</span>
+            </label>
 
-            // Di chuyển người chơi
-            if (keys["ArrowLeft"] && player.x > 0) {
-                player.x -= player.speed;
-            }
-            if (keys["ArrowRight"] && player.x + player.width < canvas.width) {
-                player.x += player.speed;
-            }
+            <label class="option-item">
+                <input type="checkbox" checked>
+                <div class="checkbox-custom"><i class="fa-solid fa-check"></i></div>
+                <span class="option-label">Target Lock</span>
+            </label>
+        </div>
+    </div>
+</div>
 
-            // Bắn đạn (giới hạn thời gian giữa các lần bắn)
-            const now = Date.now();
-            if (keys["Space"] && now - lastShot > 150) {
-                bullets.push({
-                    x: player.x + player.width / 2 - 3,
-                    y: player.y,
-                    width: 6,
-                    height: 12,
-                    speed: 7,
-                    color: "#facc15"
-                });
-                lastShot = now;
-            }
-
-            // Cập nhật vị trí Đạn
-            bullets.forEach((bullet, index) => {
-                bullet.y -= bullet.speed;
-                // Xóa đạn khi bay ra khỏi màn hình
-                if (bullet.y < 0) bullets.splice(index, 1);
-            });
-
-            // Cập nhật vị trí Kẻ địch
-            spawnEnemy();
-            enemies.forEach((enemy, enemyIndex) => {
-                enemy.y += enemy.speed;
-
-                // Kiểm tra kẻ địch chạm đáy (Thua)
-                if (enemy.y + enemy.height > canvas.height) {
-                    gameOver = true;
-                }
-
-                // Va chạm giữa Đạn và Kẻ địch
-                bullets.forEach((bullet, bulletIndex) => {
-                    if (
-                        bullet.x < enemy.x + enemy.width &&
-                        bullet.x + bullet.width > enemy.x &&
-                        bullet.y < enemy.y + enemy.height &&
-                        bullet.y + bullet.height > enemy.y
-                    ) {
-                        // Cộng điểm và xóa đạn + kẻ địch
-                        score += 10;
-                        enemies.splice(enemyIndex, 1);
-                        bullets.splice(bulletIndex, 1);
-                    }
-                });
-
-                // Va chạm giữa Người chơi và Kẻ địch
-                if (
-                    player.x < enemy.x + enemy.width &&
-                    player.x + player.width > enemy.x &&
-                    player.y < enemy.y + enemy.height &&
-                    player.y + player.height > enemy.y
-                ) {
-                    gameOver = true;
-                }
-            });
-        }
-
-        // 4. Vẽ mọi thứ lên Canvas
-        function draw() {
-            // Xóa màn hình cũ
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (gameOver) {
-                ctx.fillStyle = "#ffffff";
-                ctx.font = "bold 28px Arial";
-                ctx.fillText("GAME OVER", 120, 230);
-                ctx.font = "18px Arial";
-                ctx.fillText("Điểm của bạn: " + score, 140, 270);
-                ctx.font = "14px Arial";
-                ctx.fillText("Tải lại trang (F5) để chơi lại", 120, 310);
-                return;
-            }
-
-            // Vẽ người chơi (Tàu vũ trụ dạng tam giác)
-            ctx.fillStyle = player.color;
-            ctx.beginPath();
-            ctx.moveTo(player.x + player.width / 2, player.y);
-            ctx.lineTo(player.x, player.y + player.height);
-            ctx.lineTo(player.x + player.width, player.y + player.height);
-            ctx.closePath();
-            ctx.fill();
-
-            // Vẽ đạn
-            bullets.forEach(bullet => {
-                ctx.fillStyle = bullet.color;
-                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
-            });
-
-            // Vẽ kẻ địch
-            enemies.forEach(enemy => {
-                ctx.fillStyle = enemy.color;
-                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-            });
-
-            // Vẽ điểm số
-            ctx.fillStyle = "#ffffff";
-            ctx.font = "16px Arial";
-            ctx.fillText("Điểm: " + score, 15, 30);
-        }
-
-        // 5. Vòng lặp chính của Game
-        function gameLoop() {
-            update();
-            draw();
-            if (!gameOver) {
-                requestAnimationFrame(gameLoop);
-            }
-        }
-
-        gameLoop();
-    </script>
 </body>
 </html>
