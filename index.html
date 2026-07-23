@@ -2,132 +2,193 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Game Hứng Bóng</title>
+    <title>Game Bắn Máy Bay 2D</title>
     <style>
         body {
-            background-color: #222;
+            background-color: #0f172a;
             color: white;
             text-align: center;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
         }
         canvas {
-            background: #111;
-            border: 2px solid #00ffcc;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
-            cursor: none;
+            background: #020617;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+            border-radius: 8px;
+        }
+        .instructions {
+            margin-top: 10px;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
 
-    <h1>Game Hứng Bóng</h1>
-    <p>Di chuyển chuột để điều khiển thanh đỡ!</p>
+    <h1>🚀 Space Shooter 2D</h1>
     <canvas id="gameCanvas" width="400" height="500"></canvas>
+    <div class="instructions">
+        <p>Sử dụng phím ⬅️ ➡️ để di chuyển | Phím <b>SPACE</b> để bắn</p>
+    </div>
 
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // 1. Khai báo thông số game
+        // Trạng thái Game
         let score = 0;
         let gameOver = false;
 
-        // Quả bóng
-        let ball = {
-            x: 200,
-            y: 50,
-            radius: 10,
-            dx: 3,
-            dy: 3,
-            color: "#ff0055"
+        // Bàn phím
+        const keys = {};
+
+        window.addEventListener("keydown", e => keys[e.code] = true);
+        window.addEventListener("keyup", e => keys[e.code] = false);
+
+        // 1. Tàu của người chơi
+        const player = {
+            x: 180,
+            y: 440,
+            width: 40,
+            height: 30,
+            speed: 5,
+            color: "#38bdf8"
         };
 
-        // Thanh đỡ
-        let paddle = {
-            width: 80,
-            height: 12,
-            x: 160,
-            y: 470,
-            color: "#00ffcc"
-        };
+        // 2. Danh sách Đạn và Kẻ địch
+        let bullets = [];
+        let enemies = [];
+        let lastShot = 0;
 
-        // 2. Lắng nghe sự kiện di chuyển chuột
-        canvas.addEventListener("mousemove", function(e) {
-            let rect = canvas.getBoundingClientRect();
-            paddle.x = e.clientX - rect.left - paddle.width / 2;
-        });
-
-        // 3. Vòng lặp cập nhật trạng thái game
-        function update() {
-            if (gameOver) return;
-
-            // Di chuyển bóng
-            ball.x += ball.dx;
-            ball.y += ball.dy;
-
-            // Va chạm với tường trái/phải
-            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
-                ball.dx = -ball.dx;
-            }
-
-            // Va chạm với tường trên
-            if (ball.y - ball.radius < 0) {
-                ball.dy = -ball.dy;
-            }
-
-            // Va chạm với thanh đỡ
-            if (
-                ball.y + ball.radius >= paddle.y &&
-                ball.x >= paddle.x &&
-                ball.x <= paddle.x + paddle.width
-            ) {
-                ball.dy = -ball.dy;
-                score += 10;
-                // Tăng tốc độ bóng một chút khi đập trúng thanh đỡ
-                ball.dy *= 1.05;
-                ball.dx *= 1.05;
-            }
-
-            // Xử lý khi bóng rơi xuống đáy (Thua)
-            if (ball.y + ball.radius > canvas.height) {
-                gameOver = true;
+        // Hàm tạo kẻ địch ngẫu nhiên
+        function spawnEnemy() {
+            if (Math.random() < 0.03) { // Tỷ lệ xuất hiện kẻ địch
+                enemies.push({
+                    x: Math.random() * (canvas.width - 30),
+                    y: -30,
+                    width: 30,
+                    height: 30,
+                    speed: 2 + Math.random() * 2,
+                    color: "#f43f5e"
+                });
             }
         }
 
-        // 4. Vẽ các đối tượng lên màn hình
+        // 3. Xử lý di chuyển & Logic game
+        function update() {
+            if (gameOver) return;
+
+            // Di chuyển người chơi
+            if (keys["ArrowLeft"] && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys["ArrowRight"] && player.x + player.width < canvas.width) {
+                player.x += player.speed;
+            }
+
+            // Bắn đạn (giới hạn thời gian giữa các lần bắn)
+            const now = Date.now();
+            if (keys["Space"] && now - lastShot > 150) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 3,
+                    y: player.y,
+                    width: 6,
+                    height: 12,
+                    speed: 7,
+                    color: "#facc15"
+                });
+                lastShot = now;
+            }
+
+            // Cập nhật vị trí Đạn
+            bullets.forEach((bullet, index) => {
+                bullet.y -= bullet.speed;
+                // Xóa đạn khi bay ra khỏi màn hình
+                if (bullet.y < 0) bullets.splice(index, 1);
+            });
+
+            // Cập nhật vị trí Kẻ địch
+            spawnEnemy();
+            enemies.forEach((enemy, enemyIndex) => {
+                enemy.y += enemy.speed;
+
+                // Kiểm tra kẻ địch chạm đáy (Thua)
+                if (enemy.y + enemy.height > canvas.height) {
+                    gameOver = true;
+                }
+
+                // Va chạm giữa Đạn và Kẻ địch
+                bullets.forEach((bullet, bulletIndex) => {
+                    if (
+                        bullet.x < enemy.x + enemy.width &&
+                        bullet.x + bullet.width > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + bullet.height > enemy.y
+                    ) {
+                        // Cộng điểm và xóa đạn + kẻ địch
+                        score += 10;
+                        enemies.splice(enemyIndex, 1);
+                        bullets.splice(bulletIndex, 1);
+                    }
+                });
+
+                // Va chạm giữa Người chơi và Kẻ địch
+                if (
+                    player.x < enemy.x + enemy.width &&
+                    player.x + player.width > enemy.x &&
+                    player.y < enemy.y + enemy.height &&
+                    player.y + player.height > enemy.y
+                ) {
+                    gameOver = true;
+                }
+            });
+        }
+
+        // 4. Vẽ mọi thứ lên Canvas
         function draw() {
             // Xóa màn hình cũ
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             if (gameOver) {
-                ctx.fillStyle = "white";
-                ctx.font = "30px Arial";
-                ctx.fillText("GAME OVER", 110, 230);
-                ctx.font = "20px Arial";
-                ctx.fillText("Điểm của bạn: " + score, 130, 270);
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 28px Arial";
+                ctx.fillText("GAME OVER", 120, 230);
+                ctx.font = "18px Arial";
+                ctx.fillText("Điểm của bạn: " + score, 140, 270);
+                ctx.font = "14px Arial";
+                ctx.fillText("Tải lại trang (F5) để chơi lại", 120, 310);
                 return;
             }
 
-            // Vẽ bóng
+            // Vẽ người chơi (Tàu vũ trụ dạng tam giác)
+            ctx.fillStyle = player.color;
             ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-            ctx.fillStyle = ball.color;
-            ctx.fill();
+            ctx.moveTo(player.x + player.width / 2, player.y);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
             ctx.closePath();
+            ctx.fill();
 
-            // Vẽ thanh đỡ
-            ctx.fillStyle = paddle.color;
-            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            // Vẽ đạn
+            bullets.forEach(bullet => {
+                ctx.fillStyle = bullet.color;
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+            });
+
+            // Vẽ kẻ địch
+            enemies.forEach(enemy => {
+                ctx.fillStyle = enemy.color;
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            });
 
             // Vẽ điểm số
-            ctx.fillStyle = "white";
+            ctx.fillStyle = "#ffffff";
             ctx.font = "16px Arial";
-            ctx.fillText("Điểm: " + score, 10, 25);
+            ctx.fillText("Điểm: " + score, 15, 30);
         }
 
-        // 5. Vòng lặp chính của Game (Game Loop)
+        // 5. Vòng lặp chính của Game
         function gameLoop() {
             update();
             draw();
@@ -136,7 +197,6 @@
             }
         }
 
-        // Bắt đầu chạy game
         gameLoop();
     </script>
 </body>
