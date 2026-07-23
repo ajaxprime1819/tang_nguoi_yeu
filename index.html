@@ -3,219 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gửi Tặng Món Quà Đặc Biệt!</title>
+    <title>Cửa Hàng Trực Tuyến</title>
     <style>
+        /* --- CSS STYLES --- */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
-            height: 100vh;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .search-box input {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: none;
+            width: 250px;
+            outline: none;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 10px;
+        }
+
+        /* Danh sách sản phẩm */
+        .products-grid {
+            flex: 3;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
+            justify-content: space-between;
             text-align: center;
         }
 
-        h1 {
-            color: #d63384;
-            margin-bottom: 20px;
-            font-size: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-
-        /* Hộp quà */
-        .gift-container {
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .gift-container:hover {
-            transform: scale(1.05);
-        }
-
-        .gift-box {
-            width: 150px;
-            height: 150px;
-            background-color: #ff4757;
-            position: relative;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        .gift-box::before {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 100%;
-            background-color: #ffa502;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .gift-box::after {
-            content: '';
-            position: absolute;
-            height: 30px;
+        .product-card img {
             width: 100%;
-            background-color: #ffa502;
-            top: 50%;
-            transform: translateY(-50%);
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
         }
 
-        .gift-lid {
-            width: 170px;
-            height: 40px;
-            background-color: #ff6b81;
-            position: absolute;
-            top: -20px;
-            left: -10px;
-            border-radius: 5px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
-            transition: all 0.5s ease;
-            z-index: 2;
+        .product-title {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
         }
 
-        .gift-lid::before {
-            content: '';
-            position: absolute;
-            width: 30px;
-            height: 100%;
-            background-color: #ffa502;
-            left: 50%;
-            transform: translateX(-50%);
+        .product-price {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 12px;
         }
 
-        /* Khung hiển thị Món quà / Lời chúc */
-        .card {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
+        .btn-add {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background-color: #219150;
+        }
+
+        /* Giỏ hàng */
+        .cart-section {
+            flex: 1;
             background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 400px;
-            z-index: 10;
-            animation: popup 0.5s forwards ease-out;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: fit-content;
         }
 
-        @keyframes popup {
-            to {
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-
-        .card h2 {
-            color: #ff4757;
+        .cart-title {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
             margin-bottom: 15px;
         }
 
-        .card p {
-            color: #555;
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 20px;
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
         }
 
-        .btn-close {
-            background-color: #ff4757;
+        .cart-controls button {
+            background: #eee;
+            border: none;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .btn-remove {
+            color: #e74c3c;
+            background: none !important;
+            margin-left: 8px;
+        }
+
+        .cart-total {
+            border-top: 2px solid #eee;
+            padding-top: 15px;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            background: #e67e22;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            border-radius: 25px;
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background 0.3s;
+            font-size: 1rem;
+            font-weight: bold;
         }
 
-        .btn-close:hover {
-            background-color: #ff6b81;
-        }
-
-        /* Hiệu ứng tim bay */
-        .heart {
-            position: absolute;
-            color: #ff4757;
-            font-size: 20px;
-            animation: float 3s linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0) scale(1); opacity: 1; }
-            100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+        .btn-checkout:hover {
+            background: #d35400;
         }
     </style>
 </head>
 <body>
 
-    <h1 id="instruction">🎁 Bấm vào hộp quà để mở nhé! 🎁</h1>
+    <header>
+        <h2>Shop Online</h2>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Tìm sản phẩm..." onkeyup="searchProducts()">
+        </div>
+    </header>
 
-    <div class="gift-container" onclick="openGift()">
-        <div class="gift-lid" id="lid"></div>
-        <div class="gift-box"></div>
-    </div>
+    <div class="container">
+        <!-- Khu vực Sản phẩm -->
+        <div class="products-grid" id="productGrid">
+            <!-- Sản phẩm sẽ được hiển thị bằng JavaScript -->
+        </div>
 
-    <!-- Khung Lời Chúc & Món Quà -->
-    <div class="card" id="card">
-        <h2>💖 Gửi Tặng Người Thân Yêu! 💖</h2>
-        <p id="message">
-            Chúc bạn/người thân luôn luôn mạnh khỏe, tràn ngập niềm vui và gặp thật nhiều may mắn trong cuộc sống! 
-            <br><br>
-            <strong>Món quà của bạn:</strong> Một buổi đi ăn/đi chơi tự chọn cùng mình nhé! 🎟️✨
-        </p>
-        <button class="btn-close" onclick="closeGift()">Cảm ơn nha! 🥰</button>
+        <!-- Khu vực Giỏ hàng -->
+        <div class="cart-section">
+            <h3 class="cart-title">Giỏ Hàng Của Bạn</h3>
+            <div id="cartItems">
+                <p>Giỏ hàng đang trống.</p>
+            </div>
+            <div class="cart-total">
+                <span>Tổng tiền:</span>
+                <span id="cartTotal">0 VNĐ</span>
+            </div>
+            <button class="btn-checkout" onclick="checkout()">Thanh Toán</button>
+        </div>
     </div>
 
     <script>
-        function openGift() {
-            // Mở nắp hộp quà
-            document.getElementById('lid').style.transform = 'translateY(-80px) rotate(-15deg)';
-            
-            // Ẩn tiêu đề hướng dẫn
-            document.getElementById('instruction').style.opacity = '0';
+        // --- JAVASCRIPT LOGIC ---
 
-            // Hiện thiệp chúc mừng sau 300ms
-            setTimeout(() => {
-                document.getElementById('card').style.display = 'block';
-                createHearts();
-            }, 300);
+        // 1. Khai báo danh sách sản phẩm mẫu
+        const products = [
+            { id: 1, name: "Áo Thun Nam Premium", price: 150000, image: "https://via.placeholder.com/150/24c6dc/ffffff?text=Ao+Thun" },
+            { id: 2, name: "Quần Jean Slimfit", price: 350000, image: "https://via.placeholder.com/150/514a9d/ffffff?text=Quan+Jean" },
+            { id: 3, name: "Giày Sneaker Thể Thao", price: 550000, image: "https://via.placeholder.com/150/f12711/ffffff?text=Giay+Sneaker" },
+            { id: 4, name: "Mũ Cót Thời Trang", price: 90000, image: "https://via.placeholder.com/150/f5af19/ffffff?text=Mu+Cap" },
+            { id: 5, name: "Balo Du Lịch Chống Nước", price: 420000, image: "https://via.placeholder.com/150/11998e/ffffff?text=Balo" }
+        ];
+
+        let cart = [];
+
+        // 2. Hàm hiển thị sản phẩm ra màn hình
+        function renderProducts(list) {
+            const productGrid = document.getElementById('productGrid');
+            productGrid.innerHTML = '';
+
+            list.forEach(product => {
+                const productHTML = `
+                    <div class="product-card">
+                        <img src="${product.image}" alt="${product.name}">
+                        <h4 class="product-title">${product.name}</h4>
+                        <div class="product-price">${product.price.toLocaleString('vi-VN')} VNĐ</div>
+                        <button class="btn-add" onclick="addToCart(${product.id})">Thêm vào giỏ</button>
+                    </div>
+                `;
+                productGrid.innerHTML += productHTML;
+            });
         }
 
-        function closeGift() {
-            document.getElementById('card').style.display = 'none';
-            document.getElementById('lid').style.transform = 'none';
-            document.getElementById('instruction').style.opacity = '1';
+        // 3. Hàm thêm sản phẩm vào giỏ hàng
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const cartItem = cart.find(item => item.id === productId);
+
+            if (cartItem) {
+                cartItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            updateCart();
         }
 
-        // Tạo hiệu ứng trái tim bay
-        function createHearts() {
-            for (let i = 0; i < 25; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.classList.add('heart');
-                    heart.innerHTML = '❤️';
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    document.body.appendChild(heart);
+        // 4. Hàm cập nhật lại giỏ hàng và tổng tiền
+        function updateCart() {
+            const cartItemsContainer = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
 
-                    setTimeout(() => {
-                        heart.remove();
-                    }, 3000);
-                }, i * 150);
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p>Giỏ hàng đang trống.</p>';
+                cartTotal.innerText = '0 VNĐ';
+                return;
+            }
+
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                const itemHTML = `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small>${item.price.toLocaleString('vi-VN')} VNĐ</small>
+                        </div>
+                        <div class="cart-controls">
+                            <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                            <button class="btn-remove" onclick="removeFromCart(${item.id})">✕</button>
+                        </div>
+                    </div>
+                `;
+                cartItemsContainer.innerHTML += itemHTML;
+            });
+
+            cartTotal.innerText = `${total.toLocaleString('vi-VN')} VNĐ`;
+        }
+
+        // 5. Thay đổi số lượng
+        function changeQuantity(productId, delta) {
+            const cartItem = cart.find(item => item.id === productId);
+            if (cartItem) {
+                cartItem.quantity += delta;
+                if (cartItem.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateCart();
+                }
             }
         }
+
+        // 6. Xóa khỏi giỏ hàng
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCart();
+        }
+
+        // 7. Tìm kiếm sản phẩm
+        function searchProducts() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const filteredProducts = products.filter(p => p.name.toLowerCase().includes(keyword));
+            renderProducts(filteredProducts);
+        }
+
+        // 8. Thanh toán giả lập
+        function checkout() {
+            if (cart.length === 0) {
+                alert("Giỏ hàng của bạn đang trống!");
+            } else {
+                alert("Cảm ơn bạn đã đặt hàng! Đơn hàng sẽ sớm được xử lý.");
+                cart = [];
+                updateCart();
+            }
+        }
+
+        // Chạy hàm hiển thị lần đầu khi mở trang
+        renderProducts(products);
     </script>
 </body>
 </html>
